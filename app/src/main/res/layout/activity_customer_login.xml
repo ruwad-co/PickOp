@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.CustomerLoginActivity">
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:id="@+id/userEmailLayout"
+        android:layout_marginTop="200dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+        <EditText
+            android:id="@+id/customerLogEmailText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textEmailAddress"
+            android:hint="Email"
+            android:paddingStart="30dp"
+            android:paddingBottom="20dp"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:id="@+id/passwordLayout"
+        android:layout_marginTop="300dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+        <EditText
+            android:id="@+id/customerLogPassText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textPassword"
+            android:hint="Password"
+            android:paddingStart="30dp"
+            android:paddingBottom="20dp"/>
+    </android.support.design.widget.TextInputLayout>
+
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:text="Sign In"
+        android:layout_marginTop="400dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/white_button_background"
+        android:textColor="@color/colorPrimary"
+        android:backgroundTint="@color/colorWhite"
+        android:id="@+id/customerLogBtn"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Account"
+        android:layout_centerHorizontal="true"
+        android:textSize="15sp"
+        android:textColor="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:id="@+id/gotoRegCustomer"
+
+        />
+
+</RelativeLayout>

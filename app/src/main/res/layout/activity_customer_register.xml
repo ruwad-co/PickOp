@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.CustomerRegisterActivity">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:id="@+id/userNameLayout"
+        android:layout_marginTop="160dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+        <EditText
+            android:id="@+id/customerRegUserNameText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textPersonName"
+            android:hint="Full name"
+            android:paddingStart="30dp"
+            android:paddingBottom="20dp"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:id="@+id/emailLayout"
+        android:layout_marginTop="220dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+        <EditText
+            android:id="@+id/customerRegEmailText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textEmailAddress"
+            android:hint="Email"
+            android:paddingStart="30dp"
+            android:paddingBottom="20dp"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:id="@+id/passwordLayout"
+        android:layout_marginTop="280dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+        <EditText
+            android:id="@+id/customerRegPasswordText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textPassword"
+            android:hint="Password"
+            android:paddingStart="30dp"
+            android:paddingBottom="20dp"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:id="@+id/customerPassword2Text"
+        android:layout_marginTop="340dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+        <EditText
+            android:id="@+id/customerConfirmRegPasswordText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textPassword"
+            android:hint="Confirm password"
+            android:paddingStart="30dp"
+            android:paddingBottom="20dp"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:text="Create Account"
+        android:layout_marginTop="420dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/white_button_background"
+        android:textColor="@color/colorPrimary"
+        android:backgroundTint="@color/colorWhite"
+        android:id="@+id/customerCreateAccBtn"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign In"
+        android:layout_centerHorizontal="true"
+        android:textSize="15sp"
+        android:textColor="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:id="@+id/customerGotoSignIn"
+
+        />
+
+</RelativeLayout>
