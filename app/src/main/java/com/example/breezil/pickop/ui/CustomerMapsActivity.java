@@ -41,6 +41,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     Location mLastLocation;
     LocationRequest mLocationRequest;
     FloatingActionButton mLogout;
+    FloatingActionButton mRequestbtn;
+    private LatLng mPickUpLocation;
 
 
     @Override
@@ -56,6 +58,9 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
         mLogout = findViewById(R.id.logout);
+        mRequestbtn = findViewById(R.id.pickupRequest);
+
+
 
 
         mLogout.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +68,29 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
             public void onClick(View v) {
                 mAuth.signOut();
                 sendToStart();
+
+            }
+        });
+
+
+        mRequestbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String Uid = mAuth.getCurrentUser().getUid();
+
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("pickUpRequest");
+                GeoFire geoFire = new GeoFire(ref);
+                geoFire.setLocation(Uid, new GeoLocation(mLastLocation.getLatitude(),
+                        mLastLocation.getLongitude()));
+
+
+                mPickUpLocation = new LatLng(mLastLocation.getLatitude()
+                        ,mLastLocation.getLongitude());
+
+                mMap.addMarker(new MarkerOptions().position(mPickUpLocation).title("PickUp Here"));
+
+                mRequestbtn.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+
 
             }
         });
@@ -127,15 +155,15 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
 
-        if (mAuth.getCurrentUser() != null ){
-            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            DatabaseReference Ref = FirebaseDatabase.getInstance().getReference("CustomerLocation");
-
-
-            GeoFire geoFire = new GeoFire(Ref);
-            geoFire.setLocation(userId, new GeoLocation(location.getLatitude(),location.getLongitude()));
-
-        }
+//        if (mAuth.getCurrentUser() != null ){
+//            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//            DatabaseReference Ref = FirebaseDatabase.getInstance().getReference("CustomerLocation");
+//
+//
+//            GeoFire geoFire = new GeoFire(Ref);
+//            geoFire.setLocation(userId, new GeoLocation(location.getLatitude(),location.getLongitude()));
+//
+//        }
 
 
 //        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -192,18 +220,18 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         startActivity(startIntent);
         finish();
     }
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if(mAuth.getCurrentUser() != null){
-            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            DatabaseReference Ref = FirebaseDatabase.getInstance().getReference("CustomerLocation");
-
-
-            GeoFire geoFire = new GeoFire(Ref);
-            geoFire.removeLocation(userId);
-        }
-
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//
+//        if(mAuth.getCurrentUser() != null){
+//            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//            DatabaseReference Ref = FirebaseDatabase.getInstance().getReference("CustomerLocation");
+//
+//
+//            GeoFire geoFire = new GeoFire(Ref);
+//            geoFire.removeLocation(userId);
+//        }
+//
+//    }
 }

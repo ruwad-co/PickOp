@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.CustomerMapsActivity" >
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/logout"
@@ -17,4 +24,26 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="25dp"
         android:src="@drawable/ic_error_outline_black_24dp" />
-</fragment>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/pickupRequest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="25dp"
+        android:src="@drawable/ic_near_me_black_24dp" />
+</FrameLayout>
+
+<!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:map="http://schemas.android.com/apk/res-auto"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:id="@+id/map"-->
+    <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--tools:context=".ui.CustomerMapsActivity" >-->
+
+   <!---->
+<!--</fragment>-->
