@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.breezil.pickop.R;
@@ -53,6 +54,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     FloatingActionButton mLogout;
     FloatingActionButton mRequestbtn;
     private LatLng mPickUpLocation;
+    private TextView mDistanceText;
 
 
     @Override
@@ -69,6 +71,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         mCurrentUser = mAuth.getCurrentUser();
         mLogout = findViewById(R.id.logout);
         mRequestbtn = findViewById(R.id.pickupRequest);
+        mDistanceText = findViewById(R.id.distanceText);
 
 
 
@@ -193,6 +196,19 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                     if(mDriverMarker != null){
                         mDriverMarker.remove();
                     }
+
+                    Location loc1 = new Location("");
+                    loc1.setLatitude(mPickUpLocation.latitude);
+                    loc1.setLongitude(mPickUpLocation.longitude);
+
+
+                    Location loc2 = new Location("");
+                    loc2.setLatitude(driverLatLong.latitude);
+                    loc2.setLongitude(driverLatLong.longitude);
+
+                    float distance = loc1.distanceTo(loc2);
+                    mDistanceText.setVisibility(View.VISIBLE);
+                    mDistanceText.setText(String.valueOf(distance));
                     mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLong).title("your pickup"));
 
                 }
@@ -303,6 +319,21 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if(mAuth.getCurrentUser() != null){
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            DatabaseReference Ref = FirebaseDatabase.getInstance().getReference("DriversAvailable");
+
+
+            GeoFire geoFire = new GeoFire(Ref);
+            geoFire.removeLocation(userId);
+        }
 
     }
 
