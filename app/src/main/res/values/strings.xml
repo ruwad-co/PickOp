@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">PickOp</string>
     <string name="title_activity_customer_maps">Map</string>
+    <string name="driverhere">Your Driver is here</string>
 </resources>
