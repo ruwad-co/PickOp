@@ -57,6 +57,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     private LatLng mPickUpLocation;
     private TextView mDistanceText;
     private Boolean requestBool = false;
+    private Marker mPickOpMarker;
 
 
 
@@ -96,6 +97,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 requestBool = true;
                 mRequestbtn.setVisibility(View.INVISIBLE);
                 mCancelRequestBtn.setVisibility(View.VISIBLE);
+                mCancelRequestBtn.setEnabled(true);
                 String Uid = mAuth.getCurrentUser().getUid();
 
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference("pickUpRequest");
@@ -107,7 +109,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 mPickUpLocation = new LatLng(mLastLocation.getLatitude()
                         ,mLastLocation.getLongitude());
 
-                mMap.addMarker(new MarkerOptions().position(mPickUpLocation).title("PickUp Here"));
+                mPickOpMarker = mMap.addMarker(new MarkerOptions().position(mPickUpLocation).title("PickUp Here"));
 
                 mRequestbtn.setBackgroundColor(getResources().getColor(R.color.colorGrey));
 
@@ -118,12 +120,17 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         mCancelRequestBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                mRequestbtn.setVisibility(View.VISIBLE);
+                mCancelRequestBtn.setVisibility(View.INVISIBLE);
+                mRequestbtn.setEnabled(true);
                 requestBool = false;
                 geoQuery.removeAllListeners();
                 driverLocationRef.removeEventListener(driverLocationListener);
                 if(driverFoundId != null){
                     DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
-                            .child("Users").child("Driver").child(driverFoundId);
+                            .child("Users").child("Driver").child(driverFoundId).child("available");
+
                     driverRef.setValue(true);
                     driverFoundId = null;
                 }
@@ -135,6 +142,10 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference("pickUpRequest");
                 GeoFire geoFire = new GeoFire(ref);
                 geoFire.removeLocation(Uid);
+
+                if(mPickOpMarker != null){
+                    mPickOpMarker.remove();
+                }
             }
         });
     }
@@ -160,7 +171,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                     driverFoundId = key;
 
                     DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
-                            .child("Users").child("Driver").child(driverFoundId);
+                            .child("Users").child("Driver").child(driverFoundId).child("available");
 
                     String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -380,7 +391,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
 
     private void sendToStart() {
-        Intent startIntent = new Intent(CustomerMapsActivity.this,StartActivity.class);startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Intent startIntent = new Intent(CustomerMapsActivity.this,StartActivity.class);
+
         startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(startIntent);
         finish();
