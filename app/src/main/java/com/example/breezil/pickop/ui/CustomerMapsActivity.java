@@ -3,6 +3,7 @@ package com.example.breezil.pickop.ui;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -58,6 +60,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     private TextView mDistanceText;
     private Boolean requestBool = false;
     private Marker mPickOpMarker;
+
+    private Marker mDriverMarker;
 
 
 
@@ -98,6 +102,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 mRequestbtn.setVisibility(View.INVISIBLE);
                 mCancelRequestBtn.setVisibility(View.VISIBLE);
                 mCancelRequestBtn.setEnabled(true);
+
                 String Uid = mAuth.getCurrentUser().getUid();
 
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference("pickUpRequest");
@@ -109,7 +114,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 mPickUpLocation = new LatLng(mLastLocation.getLatitude()
                         ,mLastLocation.getLongitude());
 
-                mPickOpMarker = mMap.addMarker(new MarkerOptions().position(mPickUpLocation).title("PickUp Here"));
+                mPickOpMarker = mMap.addMarker(new MarkerOptions().position(mPickUpLocation).title("PickUp Here")
+                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_purple)));
 
                 mRequestbtn.setBackgroundColor(getResources().getColor(R.color.colorGrey));
 
@@ -145,6 +151,9 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
                 if(mPickOpMarker != null){
                     mPickOpMarker.remove();
+                }
+                if(mDriverMarker != null){
+                    mDriverMarker.remove();
                 }
             }
         });
@@ -215,7 +224,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         });
     }
 
-    private Marker mDriverMarker;
+    //private Marker mDriverMarker;
     private DatabaseReference driverLocationRef;
     private ValueEventListener driverLocationListener;
     private void getDriverLocation() {
@@ -261,7 +270,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                     }
 
 
-                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLong).title("your pickup"));
+                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLong).title("your pickup")
+                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_pickOp_car)));
 
                 }
             }
