@@ -10,6 +10,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+
 
     <application
         android:allowBackup="true"
@@ -31,6 +35,17 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths">
+            </meta-data>
+        </provider>
+
         <activity
             android:name=".ui.CustomerMapsActivity"
             android:label="@string/title_activity_customer_maps">
@@ -40,13 +55,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.StartActivity"
-            android:noHistory="true"/>
-        <activity android:name=".ui.CustomerRegisterActivity"/>
-
-        <activity android:name=".ui.CustomerLoginActivity"/>
 
 
+
+        <activity
+            android:name=".ui.StartActivity"
+            android:noHistory="true" />
+        <activity android:name=".ui.CustomerRegisterActivity" />
+        <activity android:name=".ui.CustomerLoginActivity" />
+        <activity android:name=".ui.PhoneNumberActivity" />
+        <activity android:name=".ui.UserSettingsActivity"
+            android:parentActivityName=".ui.CustomerMapsActivity"/>
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
     </application>
 
 </manifest>

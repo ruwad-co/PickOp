@@ -26,7 +26,7 @@ import java.util.HashMap;
 
 public class CustomerRegisterActivity extends AppCompatActivity {
 
-    private EditText mCustomerUserNameText, mCustomerEmailText, mCustomerPasswordText, mCustomerConfirmPasswordText;
+    private EditText mCustomerFirstNameText, mCustomerLastNameText,  mCustomerEmailText, mCustomerPasswordText;
 
     private Button mCustomerCreateBtn;
     private TextView mSignIn;
@@ -34,6 +34,7 @@ public class CustomerRegisterActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private FirebaseAuth mAuth;
     private DatabaseReference mDataref;
+    private String phone_number;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +43,14 @@ public class CustomerRegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        phone_number  = getIntent().getStringExtra("number");
+
         mSignIn = findViewById(R.id.customerGotoSignIn);
-        mCustomerUserNameText = findViewById(R.id.customerRegUserNameText);
+        mCustomerFirstNameText = findViewById(R.id.customerRegFirstNameText);
+        mCustomerLastNameText = findViewById(R.id.customerRegLastNameText);
         mCustomerEmailText = findViewById(R.id.customerRegEmailText);
         mCustomerPasswordText = findViewById(R.id.customerRegPasswordText);
-        mCustomerConfirmPasswordText = findViewById(R.id.customerConfirmRegPasswordText);
+
 
         progressDialog = new ProgressDialog(this);
 
@@ -64,22 +68,22 @@ public class CustomerRegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String emailtext = mCustomerEmailText.getText().toString().trim();
                 String passwdtext = mCustomerPasswordText.getText().toString().trim();
-                String confirmpasswdtext = mCustomerConfirmPasswordText.getText().toString().trim();
-                String userNametext = mCustomerUserNameText.getText().toString().trim();
+                String firstNametext = mCustomerFirstNameText.getText().toString().trim();
+                String lastNametext = mCustomerLastNameText.getText().toString().trim();
 
-                registerUser(emailtext,passwdtext,confirmpasswdtext,userNametext);
+                registerUser(emailtext,passwdtext,firstNametext,lastNametext);
             }
         });
     }
 
-    private void registerUser(final String emailtext, final String passwdtext, String confirmpasswdtext, final String userNametext) {
+    private void registerUser(final String emailtext, final String passwdtext, final String firstNametext, final String lastNametext) {
         /*
          * TextUtils checks if require fields are empty or not
          * and then toast error message if empty
          * if its not empty we call the firebase user creation method with email and password
          */
-        if (!TextUtils.isEmpty(emailtext) || !TextUtils.isEmpty(passwdtext) || !TextUtils.isEmpty(confirmpasswdtext) || !TextUtils.isEmpty(userNametext)){
-            if(passwdtext.equals(confirmpasswdtext)){
+        if (!TextUtils.isEmpty(emailtext) || !TextUtils.isEmpty(passwdtext) || !TextUtils.isEmpty(firstNametext) || !TextUtils.isEmpty(lastNametext)){
+
                 progressDialog.setMessage("Creating Account...");
                 progressDialog.setTitle("Please wait");
                 progressDialog.setCanceledOnTouchOutside(false);
@@ -105,10 +109,13 @@ public class CustomerRegisterActivity extends AppCompatActivity {
                             mDataref = FirebaseDatabase.getInstance().getReference().child("Users").child("Customer").child(Uid);
 
                             HashMap<String, String> userMap = new HashMap<>();
-                            userMap.put("name",userNametext);
+                            userMap.put("first_name",firstNametext);
+                            userMap.put("last_name",lastNametext);
                             userMap.put("email",emailtext);
                             userMap.put("password",passwdtext);
+                            userMap.put("phone_number",phone_number);
                             userMap.put("deviceToken",deviceToken);
+                            userMap.put("image","default_image");
 
                             //here call the set value function to save the data structure in database
                             // attach oncomplete listener if successful call intent to the mainActivity
@@ -131,9 +138,7 @@ public class CustomerRegisterActivity extends AppCompatActivity {
                         }
                     }
                 });
-            }else{
-                Toast.makeText(CustomerRegisterActivity.this,"Password does not match",Toast.LENGTH_LONG).show();
-            }
+//
 
         }else {
             Toast.makeText(CustomerRegisterActivity.this,"Please fill the fields..",Toast.LENGTH_LONG).show();

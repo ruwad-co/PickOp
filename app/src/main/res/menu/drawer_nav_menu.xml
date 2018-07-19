@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/navPayment"
+        android:icon="@drawable/ic_payment_black_24dp"
+        android:title="Payment"/>
+    <item android:id="@+id/navHistory"
+        android:icon="@drawable/ic_history"
+        android:title="PickOp History"/>
+    <item android:id="@+id/navSupport"
+        android:icon="@drawable/ic_support"
+        android:title="Support"/>
+    <item android:id="@+id/navFreePickOp"
+        android:icon="@mipmap/ic_free_ride"
+        android:title="Free PickOp"/>
+    <item android:id="@+id/settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="Settings"
+        />
+    <item android:id="@+id/LogOut"
+        android:icon="@drawable/ic_logout"
+        android:iconTint="@color/colorAccent"
+
+        android:title="Log Out"/>
+</menu>

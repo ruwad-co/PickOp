@@ -6,19 +6,42 @@
     android:layout_height="match_parent"
     tools:context=".ui.CustomerRegisterActivity">
 
+
+
+
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="60sp"
-        android:id="@+id/userNameLayout"
+        android:id="@+id/userFirstNameLayout"
         android:layout_marginTop="160dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp">
         <EditText
-            android:id="@+id/customerRegUserNameText"
+            android:id="@+id/customerRegFirstNameText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:inputType="textPersonName"
-            android:hint="Full name"
+            android:hint="First Name"
+            android:paddingStart="30dp"
+            android:paddingBottom="20dp"/>
+    </android.support.design.widget.TextInputLayout>
+
+
+
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:id="@+id/userNameLayout"
+        android:layout_marginTop="220dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+        <EditText
+            android:id="@+id/customerRegLastNameText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textPersonName"
+            android:hint="Last name"
             android:paddingStart="30dp"
             android:paddingBottom="20dp"/>
     </android.support.design.widget.TextInputLayout>
@@ -27,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="60sp"
         android:id="@+id/emailLayout"
-        android:layout_marginTop="220dp"
+        android:layout_marginTop="280dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp">
         <EditText
@@ -44,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="60sp"
         android:id="@+id/passwordLayout"
-        android:layout_marginTop="280dp"
+        android:layout_marginTop="340dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp">
         <EditText
@@ -57,22 +80,6 @@
             android:paddingBottom="20dp"/>
     </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="60sp"
-        android:id="@+id/customerPassword2Text"
-        android:layout_marginTop="340dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp">
-        <EditText
-            android:id="@+id/customerConfirmRegPasswordText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:inputType="textPassword"
-            android:hint="Confirm password"
-            android:paddingStart="30dp"
-            android:paddingBottom="20dp"/>
-    </android.support.design.widget.TextInputLayout>
 
     <Button
         android:layout_width="match_parent"

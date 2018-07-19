@@ -62,7 +62,7 @@
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="iconShape" value="NONE" />
                                       <entry key="imageAsset" value="C:\Users\breezil\Downloads\pickup-car.png" />
-                                      <entry key="outputName" value="ic_pickOp_car" />
+                                      <entry key="outputName" value="ic_free_ride" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -98,7 +98,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio2/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_clear_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/android-studio_preview/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_menu_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -109,7 +109,7 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_clear_black_24dp" />
+                            <entry key="outputName" value="ic_menu" />
                             <entry key="sourceFile" value="C:\Users\breezil" />
                           </map>
                         </option>

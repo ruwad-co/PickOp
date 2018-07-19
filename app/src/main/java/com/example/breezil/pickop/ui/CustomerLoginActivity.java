@@ -17,8 +17,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 public class CustomerLoginActivity extends AppCompatActivity {
@@ -52,7 +56,7 @@ public class CustomerLoginActivity extends AppCompatActivity {
         mRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(CustomerLoginActivity.this, CustomerRegisterActivity.class));
+                startActivity(new Intent(CustomerLoginActivity.this, PhoneNumberActivity.class));
             }
         });
 
@@ -85,6 +89,7 @@ public class CustomerLoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if(task.isSuccessful()){
+
                                             Intent mainIntent = new Intent(CustomerLoginActivity.this,CustomerMapsActivity.class);
                                             mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                             startActivity(mainIntent);
@@ -97,9 +102,43 @@ public class CustomerLoginActivity extends AppCompatActivity {
                         Toast.makeText(CustomerLoginActivity.this ,"Login Error Please try again",Toast.LENGTH_LONG).show();
                     }
                 }
+
+
             });
         }else{
             Toast.makeText(CustomerLoginActivity.this ,"Please type login details",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void checkUserExist() {
+
+        if(mAuth.getCurrentUser() != null){
+            String user_id = mAuth.getCurrentUser().getUid();
+            DatabaseReference mUserRef = FirebaseDatabase.getInstance().getReference().child("Customer").child(user_id);
+
+            mUserRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.hasChild("phone_number")){
+                        Intent mainIntent = new Intent(CustomerLoginActivity.this,CustomerMapsActivity.class);
+                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(mainIntent);
+                        finish();
+                    }else {
+                        Intent phoneIntent = new Intent(CustomerLoginActivity.this,PhoneNumberActivity.class);
+                        phoneIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(phoneIntent);
+                        finish();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
         }
     }
 }

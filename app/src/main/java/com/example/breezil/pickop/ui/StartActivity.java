@@ -26,7 +26,7 @@ public class StartActivity extends AppCompatActivity {
             public void onClick(View v) {
 //                Intent registerIntent = new Intent(StartActivity.this, CustomerMapsActivity.class);
 
-                startActivity(new Intent(StartActivity.this, CustomerRegisterActivity.class));
+                startActivity(new Intent(StartActivity.this, PhoneNumberActivity.class));
 
             }
         });
