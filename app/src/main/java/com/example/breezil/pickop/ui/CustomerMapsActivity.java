@@ -1,9 +1,13 @@
 package com.example.breezil.pickop.ui;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -13,6 +17,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
@@ -23,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.breezil.pickop.R;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -31,8 +37,11 @@ import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -62,9 +71,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class CustomerMapsActivity extends FragmentActivity implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, NavigationView.OnNavigationItemSelectedListener {
+public class CustomerMapsActivity extends FragmentActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout mDrawerLayout;
     private ConstraintLayout mNavHeader;
@@ -89,6 +96,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     SupportMapFragment mapFragment;
 
 
+    private FusedLocationProviderClient mFusedLocationProviderClient;
     private LatLng mPickUpLocation;
     private TextView mDistanceText;
     private Boolean requestBool = false;
@@ -123,15 +131,13 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(CustomerMapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
-        } else {
-            mapFragment.getMapAsync(this);
-        }
 
 
         mAuth = FirebaseAuth.getInstance();
@@ -162,13 +168,6 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         mNavImage = navHeaderView.findViewById(R.id.customerNavImage);
         mNavFirstName = navHeaderView.findViewById(R.id.userNavName);
 
-        mNavHeader.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent settingIntent = new Intent(CustomerMapsActivity.this, UserSettingsActivity.class);
-                startActivity(settingIntent);
-            }
-        });
 
 
         mMenuBtn.setOnClickListener(new View.OnClickListener() {
@@ -268,18 +267,14 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                         mNavFirstName.setText(mUserFirstName);
 
                         if (!mUserImage.equals("default")) {
-                            Picasso.with(CustomerMapsActivity.this).load(mUserImage)
-                                    .placeholder(R.drawable.default_avatar).into(mNavImage, new Callback() {
-                                @Override
-                                public void onSuccess() {
 
-                                }
+                            Glide.with(getApplication())
+                                    .load(mUserImage)
+                                    .apply(new RequestOptions().override(100, 100).placeholder(R.drawable.default_avatar).error(R.drawable.default_avatar))
+                                    .into(mNavImage);
+                        }else {
+                            mNavImage.setImageResource(R.drawable.default_avatar);
 
-                                @Override
-                                public void onError() {
-                                    Picasso.with(CustomerMapsActivity.this).load(mUserImage).placeholder(R.drawable.default_avatar).into(mNavImage);
-                                }
-                            });
                         }
                     }
 
@@ -463,7 +458,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 if (dataSnapshot.exists()) {
                     String firstname = dataSnapshot.child("first_name").getValue().toString();
                     String lastname = dataSnapshot.child("last_name").getValue().toString();
-                    String image = dataSnapshot.child("thumb").getValue().toString();
+                    String image = dataSnapshot.child("image").getValue().toString();
                     String number = dataSnapshot.child("phone_number").getValue().toString();
                     String vehicle = dataSnapshot.child("vehicle").getValue().toString();
 
@@ -472,7 +467,13 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                     driversVehicle.setText(vehicle);
 
                     if (!image.equals("default")) {
-                        Glide.with(getApplication()).load(image).into(driversImage);
+                        Glide.with(getApplication())
+                                .load(image)
+                                .apply(new RequestOptions().override(100, 100).placeholder(R.drawable.default_avatar).error(R.drawable.default_avatar))
+                                .into(driversImage);
+                    }else {
+                        driversImage.setImageResource(R.drawable.default_avatar);
+
                     }
                 }
             }
@@ -560,6 +561,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
             mGoogleApiClient.connect();
         }
 
+        connectCustomer();
+
 
     }
 
@@ -577,108 +580,100 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
-
-//        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
-            ActivityCompat.requestPermissions(CustomerMapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
-
-
-        }
-        buildGoogleApiClient();
-        mMap.setMyLocationEnabled(true);
-    }
-    protected synchronized void buildGoogleApiClient(){
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        mGoogleApiClient.connect();
-
-    }
-
-
-    @Override
-    public void onLocationChanged(Location location) {
-        mLastLocation = location;
-        LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-
-
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(mLocationRequest.PRIORITY_HIGH_ACCURACY);
 
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            ActivityCompat.requestPermissions(CustomerMapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
-//        }
-//        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
 
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(CustomerMapsActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
-            return;
+            }else {
+                checkLocationPermission();
+            }
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-    }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        mFusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+        if(mMap != null){
+            mMap.setMyLocationEnabled(true);
+        }
 
     }
 
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
+    LocationCallback mLocationCallback = new LocationCallback(){
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            for(Location location : locationResult.getLocations()){
+                if(getApplicationContext()!=null){
+                    mLastLocation = location;
 
+                    LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+                }
+            }
+        }
+    };
+
+
+
+    private void checkLocationPermission() {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
+                new AlertDialog.Builder(this)
+                        .setTitle("give permission")
+                        .setMessage("allow pickop to use location")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(CustomerMapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+                            }
+                        })
+                        .create()
+
+                        .show();
+
+            }else {
+                ActivityCompat.requestPermissions(CustomerMapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+            }
+        }
     }
 
 
-    final  int LOCATION_REQUEST_CODE = 1;
+    private void connectCustomer() {
+        checkLocationPermission();
+        mFusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+        if(mMap != null){
+            mMap.setMyLocationEnabled(true);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case LOCATION_REQUEST_CODE:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    mapFragment.getMapAsync(this);
-                }else {
-                    Toast.makeText(getApplicationContext(),"Please provide permission", Toast.LENGTH_LONG).show();
+        switch(requestCode){
+            case 1:{
+                if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                        mFusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+                        mMap.setMyLocationEnabled(true);
+                    }
+                } else{
+                    Toast.makeText(getApplicationContext(), "Please provide the permission", Toast.LENGTH_LONG).show();
                 }
                 break;
+            }
         }
     }
+
+
+
+
+
 
 
     @Override

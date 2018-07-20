@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.breezil.pickop.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -161,7 +162,14 @@ public class UserSettingsActivity extends AppCompatActivity {
                     String image = dataSnapshot.child("image").getValue().toString();
                     if(image != null){
                         if(!image.equals("default")){
-                            Glide.with(getApplication()).load(image).into(mUserImage);
+//                            Glide.with(getApplication()).load(image).into(mUserImage);
+                            Glide.with(getApplication())
+                                    .load(image)
+                                    .apply(new RequestOptions().override(100, 100).placeholder(R.drawable.default_avatar).error(R.drawable.default_avatar))
+                                    .into(mUserImage);
+                        }else {
+                            mUserImage.setImageResource(R.drawable.default_avatar);
+
                         }
 
                     }
