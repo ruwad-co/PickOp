@@ -24,6 +24,8 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -108,6 +110,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     String mUid;
 
     String destination;
+    LatLng destinationLatLong;
 
 
     TextView driversName;
@@ -115,6 +118,13 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     CircleImageView driversImage;
     TextView driversVehicle;
     BottomSheetDialog bottomSheetDialog;
+
+
+    private RadioGroup mPickOpGroup;
+    private RadioButton mPickOpLight;
+    private RadioButton mPickOpMedium;
+    private RadioButton mPickOpHeavy;
+    String mRequestType;
 
 
 //    userInfo
@@ -149,6 +159,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
             mUid = mCurrentUser.getUid();
         }
 
+        destinationLatLong = new LatLng(0.0,0.0);
+
 
         mRequestbtn = findViewById(R.id.pickOprequestbtn);
         mCancelRequestBtn = findViewById(R.id.cancelRequest);
@@ -168,6 +180,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         mNavImage = navHeaderView.findViewById(R.id.customerNavImage);
         mNavFirstName = navHeaderView.findViewById(R.id.userNavName);
 
+        mPickOpGroup = findViewById(R.id.pickop_type);
+        mPickOpGroup.check(R.id.pickop_light);
 
 
         mMenuBtn.setOnClickListener(new View.OnClickListener() {
@@ -216,6 +230,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place.
                 destination = place.getName().toString();
+                destinationLatLong = place.getLatLng();
             }
 
             @Override
@@ -303,6 +318,17 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
     void sendRequest() {
 
+        int selectedId = mPickOpGroup.getCheckedRadioButtonId();
+
+        final RadioButton pickOpType = findViewById(selectedId);
+
+        if(pickOpType.getText() == null){
+            return;
+        }
+
+        mRequestType = pickOpType.getText().toString();
+
+
         requestBool = true;
         mCancelRequestBtn.setVisibility(View.VISIBLE);
         mCancelRequestBtn.setEnabled(true);
@@ -331,41 +357,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
         mCancelRequestBtn.setVisibility(View.INVISIBLE);
         mRequestbtn.setEnabled(true);
-        requestBool = false;
-        geoQuery.removeAllListeners();
-
-        if (driverLocationRef != null) {
-
-            driverLocationRef.removeEventListener(driverLocationListener);
-            if (driverFoundId != null) {
-                DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
-                        .child("Users").child("Driver").child(driverFoundId).child("available");
-
-                driverRef.setValue(true);
-                driverFoundId = null;
-            }
-            driverFound = false;
-            radius = 1;
-        }
-
-
-        String Uid = mAuth.getCurrentUser().getUid();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("pickUpRequest");
-        GeoFire geoFire = new GeoFire(ref);
-        geoFire.removeLocation(Uid);
-
-        if (mPickOpMarker != null) {
-            mPickOpMarker.remove();
-        }
-        if (mDriverMarker != null) {
-            mDriverMarker.remove();
-        }
-
-        mRequestbtn.setText("Request PickOp");
-        mDistanceText.setVisibility(View.INVISIBLE);
-        bottomSheetDialog.dismiss();
-
-
+        endPickOp();
     }
 
     private int radius = 1;
@@ -384,26 +376,84 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
+
                 if (!driverFound && requestBool) {
-                    driverFound = true;
-                    driverFoundId = key;
 
-                    DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
-                            .child("Users").child("Driver").child(driverFoundId).child("available");
+                    if(driverFound){
+                        return;
+                    }
 
-                    String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                    HashMap map = new HashMap();
-                    map.put("customerId", customerId);
-                    map.put("destination", destination);
-                    driverRef.updateChildren(map);
+                        driverFound = true;
+                        driverFoundId = key;
 
-                    getDriverLocation();
+                        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
+                                .child("Users").child("Driver").child(driverFoundId).child("available");
 
-                    getDriversInformation();
+                        String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                    mRequestbtn.setEnabled(false);
-                    Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
+                        HashMap map = new HashMap();
+                        map.put("customerId", customerId);
+                        map.put("destination", destination);
+                        map.put("destinationLat", destinationLatLong.latitude);
+                        map.put("destinationLong", destinationLatLong.longitude);
+                        driverRef.updateChildren(map);
+
+                        getDriverLocation();
+
+                        getDriversInformation();
+                        getHasPickOpEnded();
+
+                        mRequestbtn.setText("Looking for PickOp ...");
+                        Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
+
+
+//
+//                    DatabaseReference mCustomerRequestTypeRef = FirebaseDatabase.getInstance()
+//                            .getReference().child("Users").child("Driver").child(key);
+//                    mCustomerRequestTypeRef.addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(DataSnapshot dataSnapshot) {
+//                            if(dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0 ){
+//                                Map<String, Object> typeMap = (Map<String, Object>)dataSnapshot.getValue();
+//
+//                                if(driverFound){
+//                                    return;
+//                                }
+//
+//                                if(typeMap.get("type").equals(mRequestType)){
+//                                    driverFound = true;
+//                                    driverFoundId = dataSnapshot.getKey();
+//
+//                                    DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
+//                                            .child("Users").child("Driver").child(driverFoundId).child("available");
+//
+//                                    String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//
+//                                    HashMap map = new HashMap();
+//                                    map.put("customerId", customerId);
+//                                    map.put("destination", destination);
+//                                    driverRef.updateChildren(map);
+//
+//                                    getDriverLocation();
+//
+//                                    getDriversInformation();
+//
+//                                    mRequestbtn.setText("Looking for PickOp ...");
+//                                    Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
+//
+//                                }
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(DatabaseError databaseError) {
+//
+//                        }
+//                    });
+
+
+
 
 
                 }
@@ -567,6 +617,83 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     }
 
 
+    DatabaseReference pickOpEndedRef;
+    private ValueEventListener pickOpEndedRefListener;
+    private void getHasPickOpEnded() {
+
+        if(mAuth.getCurrentUser() != null){
+             pickOpEndedRef = FirebaseDatabase.getInstance().getReference()
+                    .child("Users").child("Driver").child(driverFoundId).child("available").child("customerId");
+
+            pickOpEndedRefListener = pickOpEndedRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+
+
+
+                    }else {
+
+                        endPickOp();
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+
+
+
+    }
+
+    private void endPickOp() {
+        requestBool = false;
+        geoQuery.removeAllListeners();
+
+        if (driverLocationRef != null) {
+
+            driverLocationRef.removeEventListener(driverLocationListener);
+            pickOpEndedRef.removeEventListener(pickOpEndedRefListener);
+
+            if (driverFoundId != null) {
+                DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
+                        .child("Users").child("Driver").child(driverFoundId).child("available");
+
+                driverRef.setValue(true);
+                driverFoundId = null;
+            }
+            driverFound = false;
+            radius = 1;
+        }
+
+
+        String Uid = mAuth.getCurrentUser().getUid();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("pickUpRequest");
+        GeoFire geoFire = new GeoFire(ref);
+        geoFire.removeLocation(Uid);
+
+        if (mPickOpMarker != null) {
+            mPickOpMarker.remove();
+        }
+        if (mDriverMarker != null) {
+            mDriverMarker.remove();
+        }
+
+        mRequestbtn.setText("Request PickOp");
+        mDistanceText.setVisibility(View.INVISIBLE);
+
+        if(bottomSheetDialog != null){
+            bottomSheetDialog.dismiss();
+        }
+
+
+
+    }
 
 
     /**

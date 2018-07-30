@@ -42,6 +42,8 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'id.zelory:compressor:2.1.0'
     implementation 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'com.github.jd-alexander:library:1.1.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

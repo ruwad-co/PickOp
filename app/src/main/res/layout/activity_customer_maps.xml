@@ -75,7 +75,42 @@
                 android:layout_marginBottom="10dp"
                 android:visibility="invisible"/>
 
-            <Button
+        <RadioGroup
+            android:id="@+id/pickop_type"
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/userEmailLayout">
+
+            <RadioButton
+                android:id="@+id/pickop_light"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PickOpLight" />
+
+            <RadioButton
+                android:id="@+id/pickop_medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PickOpMedium" />
+
+            <RadioButton
+                android:id="@+id/pickop_Heavy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PickOpHeavy" />
+        </RadioGroup>
+
+
+        <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
