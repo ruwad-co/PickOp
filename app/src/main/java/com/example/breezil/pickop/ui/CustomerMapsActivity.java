@@ -62,6 +62,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -335,10 +336,22 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
         String Uid = mAuth.getCurrentUser().getUid();
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("pickUpRequest");
-        GeoFire geoFire = new GeoFire(ref);
+        DatabaseReference pickOpRef = FirebaseDatabase.getInstance().getReference("pickUpRequest");
+        GeoFire geoFire = new GeoFire(pickOpRef);
         geoFire.setLocation(Uid, new GeoLocation(mLastLocation.getLatitude(),
                 mLastLocation.getLongitude()));
+
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("state","requested");
+        requestMap.put("time", ServerValue.TIMESTAMP);
+        requestMap.put("type",mRequestType);
+        pickOpRef.child("extra").child(mUid).updateChildren(requestMap, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                Toast.makeText(CustomerMapsActivity.this,"Requested",Toast.LENGTH_LONG).show();
+            }
+        });
+
 
 
         mPickUpLocation = new LatLng(mLastLocation.getLatitude()
@@ -383,29 +396,36 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                         return;
                     }
 
-
                         driverFound = true;
                         driverFoundId = key;
 
-                        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
-                                .child("Users").child("Driver").child(driverFoundId).child("available");
+                        DatabaseReference requestAccepted = FirebaseDatabase.getInstance().getReference()
+                                .child("pickUpRequest").child("extra").child(mUid).child("state");
 
-                        String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        if(requestAccepted.equals("accepted")){
 
-                        HashMap map = new HashMap();
-                        map.put("customerId", customerId);
-                        map.put("destination", destination);
-                        map.put("destinationLat", destinationLatLong.latitude);
-                        map.put("destinationLong", destinationLatLong.longitude);
-                        driverRef.updateChildren(map);
+                            DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
+                                    .child("Users").child("Driver").child(driverFoundId).child("available");
 
-                        getDriverLocation();
+                            String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                        getDriversInformation();
-                        getHasPickOpEnded();
+                            HashMap map = new HashMap();
+                            map.put("customerId", customerId);
+                            map.put("destination", destination);
+                            map.put("destinationLat", destinationLatLong.latitude);
+                            map.put("destinationLong", destinationLatLong.longitude);
+                            driverRef.updateChildren(map);
 
-                        mRequestbtn.setText("Looking for PickOp ...");
-                        Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
+                            getDriverLocation();
+
+                            getDriversInformation();
+                            getHasPickOpEnded();
+
+                            mRequestbtn.setText("Looking for PickOp ...");
+                            Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
+
+                        }
+
 
 
 //
@@ -676,6 +696,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("pickUpRequest");
         GeoFire geoFire = new GeoFire(ref);
         geoFire.removeLocation(Uid);
+        ref.child("extra").child(mUid).removeValue();
+
 
         if (mPickOpMarker != null) {
             mPickOpMarker.remove();
@@ -690,6 +712,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         if(bottomSheetDialog != null){
             bottomSheetDialog.dismiss();
         }
+
+        mCancelRequestBtn.setVisibility(View.INVISIBLE);
 
 
 
