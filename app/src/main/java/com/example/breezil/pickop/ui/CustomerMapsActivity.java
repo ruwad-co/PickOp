@@ -399,10 +399,10 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                         driverFound = true;
                         driverFoundId = key;
 
-                        DatabaseReference requestAccepted = FirebaseDatabase.getInstance().getReference()
-                                .child("pickUpRequest").child("extra").child(mUid).child("state");
-
-                        if(requestAccepted.equals("accepted")){
+//                        DatabaseReference requestAccepted = FirebaseDatabase.getInstance().getReference()
+//                                .child("pickUpRequest").child("extra").child(mUid).child("state");
+//
+//
 
                             DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
                                     .child("Users").child("Driver").child(driverFoundId).child("available");
@@ -424,7 +424,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                             mRequestbtn.setText("Looking for PickOp ...");
                             Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
 
-                        }
+
 
 
 

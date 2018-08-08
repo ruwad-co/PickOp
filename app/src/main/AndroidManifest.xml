@@ -14,8 +14,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -43,8 +41,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths">
-            </meta-data>
+                android:resource="@xml/file_paths"></meta-data>
         </provider>
 
         <activity
@@ -56,20 +53,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
-
         <activity
             android:name=".ui.StartActivity"
             android:noHistory="true" />
         <activity android:name=".ui.CustomerRegisterActivity" />
         <activity android:name=".ui.CustomerLoginActivity" />
         <activity android:name=".ui.PhoneNumberActivity" />
-        <activity android:name=".ui.UserSettingsActivity"
-            android:parentActivityName=".ui.CustomerMapsActivity"/>
+        <activity
+            android:name=".ui.UserSettingsActivity"
+            android:parentActivityName=".ui.CustomerMapsActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
+        <activity android:name=".ui.HistoryActivity"></activity>
     </application>
 
 </manifest>
