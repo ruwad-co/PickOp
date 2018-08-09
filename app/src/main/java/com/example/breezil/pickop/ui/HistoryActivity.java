@@ -91,12 +91,14 @@ public class HistoryActivity extends AppCompatActivity {
                 if(dataSnapshot.exists()){
                     String pickOpId = dataSnapshot.getKey();
                     Long timeStamp = 0L;
-                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                        if(dataSnapshot.getKey().equals("time"));
-                        timeStamp = Long.valueOf(dataSnapshot.getValue().toString());
+                    for (DataSnapshot child : dataSnapshot.getChildren()){
+                        if(child.getKey().equals("time")){
+                            timeStamp = Long.valueOf(child.getValue().toString());
+                        }
                     }
 
                     History history = new History(pickOpId,getTimeStamp(timeStamp));
+
                     resultHistory.add(history);
                     historyRecyclerViewAdapter.notifyDataSetChanged();
                 }

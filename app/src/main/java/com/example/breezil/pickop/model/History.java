@@ -6,6 +6,9 @@ public class History {
 
     private String time;
 
+    public History() {
+    }
+
     public History(String historyId, String time) {
         this.historyId = historyId;
         this.time = time;

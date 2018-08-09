@@ -3,14 +3,17 @@ package com.example.breezil.pickop.Adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.breezil.pickop.R;
 import com.example.breezil.pickop.model.History;
 
+import java.util.Date;
 import java.util.List;
 
 public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecyclerViewAdapter.HistoryHolder> {
@@ -40,6 +43,7 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
     public void onBindViewHolder(@NonNull HistoryHolder holder, int position) {
         holder.historyId.setText(mHistoryList.get(position).getHistoryId());
         holder.time.setText(mHistoryList.get(position).getTime());
+
     }
 
     @Override
