@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 
 import com.example.breezil.pickop.Adapter.HistoryRecyclerViewAdapter;
 import com.example.breezil.pickop.R;
@@ -17,12 +18,20 @@ public class HistoryActivity extends AppCompatActivity {
     private RecyclerView mHistoryRecyclerView;
     HistoryRecyclerViewAdapter historyRecyclerViewAdapter;
     RecyclerView.LayoutManager layoutManager;
+    Toolbar mToolBar;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+
+        mToolBar = findViewById(R.id.historybar);
+
+        setSupportActionBar(mToolBar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("History");
+
 
         mHistoryRecyclerView = findViewById(R.id.historyRecyclerView);
         mHistoryRecyclerView.setNestedScrollingEnabled(true);

@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.breezil.pickop.R;
+import com.example.breezil.pickop.model.History;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -862,6 +863,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 break;
 
             case R.id.navHistory:
+                gotoHistory();
                 break;
             case R.id.navSupport:
                 break;
@@ -875,5 +877,10 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 break;
         }
         return true;
+    }
+
+    private void gotoHistory() {
+        Intent historyIntent = new Intent(this, HistoryActivity.class);
+        startActivity(historyIntent);
     }
 }
