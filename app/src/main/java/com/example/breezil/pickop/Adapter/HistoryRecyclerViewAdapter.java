@@ -39,6 +39,7 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
     @Override
     public void onBindViewHolder(@NonNull HistoryHolder holder, int position) {
         holder.historyId.setText(mHistoryList.get(position).getHistoryId());
+        holder.time.setText(mHistoryList.get(position).getTime());
     }
 
     @Override
@@ -49,12 +50,15 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
     public static class HistoryHolder  extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView historyId;
+        TextView time;
         public HistoryHolder(View itemView) {
             super(itemView);
 
             itemView.setOnClickListener(this);
 
             historyId =itemView.findViewById(R.id.historyId);
+            time =itemView.findViewById(R.id.timeId);
+
 
         }
 

@@ -4,8 +4,19 @@ public class History {
 
     private String historyId;
 
-    public History(String historyId) {
+    private String time;
+
+    public History(String historyId, String time) {
         this.historyId = historyId;
+        this.time = time;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getHistoryId() {

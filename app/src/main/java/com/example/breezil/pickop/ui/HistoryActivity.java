@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 
 import com.example.breezil.pickop.Adapter.HistoryRecyclerViewAdapter;
 import com.example.breezil.pickop.R;
@@ -16,8 +17,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
+
+import java.util.Calendar;
 import java.util.List;
+
+import java.util.ArrayList;
+import java.util.Locale;
+
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -84,7 +90,13 @@ public class HistoryActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     String pickOpId = dataSnapshot.getKey();
-                    History history = new History(pickOpId);
+                    Long timeStamp = 0L;
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                        if(dataSnapshot.getKey().equals("time"));
+                        timeStamp = Long.valueOf(dataSnapshot.getValue().toString());
+                    }
+
+                    History history = new History(pickOpId,getTimeStamp(timeStamp));
                     resultHistory.add(history);
                     historyRecyclerViewAdapter.notifyDataSetChanged();
                 }
@@ -96,6 +108,14 @@ public class HistoryActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private String getTimeStamp(Long timeStamp) {
+        Calendar cal = Calendar.getInstance(Locale.getDefault());
+        cal.setTimeInMillis(timeStamp*1000);
+        String dateTime = DateFormat.format("dd-MM-yyyy hh:mm",cal).toString();
+
+        return dateTime;
     }
 
     private ArrayList resultHistory = new ArrayList<History>();
