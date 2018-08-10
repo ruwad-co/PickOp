@@ -1,6 +1,8 @@
 package com.example.breezil.pickop.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -12,6 +14,8 @@ import android.widget.Toast;
 
 import com.example.breezil.pickop.R;
 import com.example.breezil.pickop.model.History;
+import com.example.breezil.pickop.ui.HistoryDetailActivity;
+import com.example.breezil.pickop.ui.StartActivity;
 
 import java.util.Date;
 import java.util.List;
@@ -68,7 +72,11 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
 
         @Override
         public void onClick(View v) {
-
+            Intent detailHistoryIntent = new Intent(v.getContext(), HistoryDetailActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("historyId", historyId.getText().toString());
+            detailHistoryIntent.putExtras(bundle);
+            v.getContext().startActivity(detailHistoryIntent);
         }
     }
 

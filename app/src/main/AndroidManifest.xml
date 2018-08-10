@@ -41,7 +41,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
         <activity
@@ -65,8 +65,11 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
-        <activity android:name=".ui.HistoryActivity"
-            android:parentActivityName=".ui.CustomerMapsActivity"/>
+        <activity
+            android:name=".ui.HistoryActivity"
+            android:parentActivityName=".ui.CustomerMapsActivity" />
+        <activity android:name=".ui.HistoryDetailActivity"
+            android:parentActivityName=".ui.HistoryActivity"/>
     </application>
 
 </manifest>
