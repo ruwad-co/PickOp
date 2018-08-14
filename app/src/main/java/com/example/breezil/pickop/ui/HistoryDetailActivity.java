@@ -1,10 +1,12 @@
 package com.example.breezil.pickop.ui;
 
+import android.annotation.SuppressLint;
 import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,11 +54,15 @@ public class HistoryDetailActivity extends AppCompatActivity implements OnMapRea
     private TextView mLocationText, mDistanceText, mDateText, mNameText, mPhoneNumberText;
     CircleImageView mUserImage;
 
+    RatingBar mRatingBar;
+
     String mUid, mDriverId;
 
     DatabaseReference historyRef;
 
     private LatLng destinationLatLng, pickOpLatLng;
+    private String distance;
+    private Double pickOpPrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +88,8 @@ public class HistoryDetailActivity extends AppCompatActivity implements OnMapRea
         mPhoneNumberText = findViewById(R.id.historyUserPhone);
         mUserImage = findViewById(R.id.historyUserImage);
 
+        mRatingBar = findViewById(R.id.ratingBar);
+
         mUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         historyRef = FirebaseDatabase.getInstance().getReference().child("History").child(mHistoryId);
@@ -93,6 +101,7 @@ public class HistoryDetailActivity extends AppCompatActivity implements OnMapRea
     private void loadHistoryInfo() {
 
         historyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -106,6 +115,17 @@ public class HistoryDetailActivity extends AppCompatActivity implements OnMapRea
                         if (child.getKey().equals("time")) {
                             mDateText.setText(getTimeStamp(Long.valueOf(child.getValue().toString())));
                         }
+
+                        if (child.getKey().equals("rating")) {
+                            mRatingBar.setRating(Integer.valueOf(child.getValue().toString()));
+                        }
+
+                        if (child.getKey().equals("distance")) {
+                            distance = child.getValue().toString();
+                            mDistanceText.setText(distance.substring(0,Math.min(distance.length(), 5 ))+ " km");
+                            pickOpPrice = Double.valueOf(distance) * 5;
+                        }
+
                         if (child.getKey().equals("destination")) {
                             mLocationText.setText("To :" +child.getValue().toString());
                         }
@@ -163,6 +183,8 @@ public class HistoryDetailActivity extends AppCompatActivity implements OnMapRea
 
                         }
                     }
+                    
+                    displayRating();
                 }
             }
 
@@ -171,6 +193,21 @@ public class HistoryDetailActivity extends AppCompatActivity implements OnMapRea
 
             }
         });
+    }
+
+    private void displayRating() {
+
+        mRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                historyRef.child("rating").setValue(rating);
+
+                DatabaseReference mDriverRating  = FirebaseDatabase.getInstance().getReference().child("Users")
+                        .child("Driver").child(mDriverId).child("rating");
+                mDriverRating.child(mHistoryId).setValue(rating);
+            }
+        });
+
     }
 
     private String getTimeStamp(Long timeStamp) {
@@ -228,8 +265,8 @@ public class HistoryDetailActivity extends AppCompatActivity implements OnMapRea
 
         mMap.animateCamera(cameraUpdate);
 
-        mMap.addMarker(new MarkerOptions().position(pickOpLatLng).title("pickup location").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_purple)));
-        mMap.addMarker(new MarkerOptions().position(destinationLatLng).title("destination"));
+        mMap.addMarker(new MarkerOptions().position(pickOpLatLng).title("pickup location").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_pickop_car)));
+        mMap.addMarker(new MarkerOptions().position(destinationLatLng).title("destination").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_green)));
 
         if(polylines.size()>0) {
             for (Polyline poly : polylines) {

@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,6 +99,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     FloatingActionButton mMenuBtn;
 
     SupportMapFragment mapFragment;
+
+    private RatingBar mRatingBar;
 
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -522,6 +525,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         driversNumber = bottomSheetView.findViewById(R.id.sheet_number);
         driversImage = bottomSheetView.findViewById(R.id.sheet_image);
         driversVehicle = bottomSheetView.findViewById(R.id.sheet_vehicle);
+        mRatingBar = bottomSheetView.findViewById(R.id.sheet_rating);
 
         driverRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -545,6 +549,18 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                     }else {
                         driversImage.setImageResource(R.drawable.default_avatar);
 
+                    }
+
+                    int ratingSum = 0;
+                    float ratingTotal = 0;
+                    float ratingAverage = 0;
+                    for(DataSnapshot child: dataSnapshot.child("rating").getChildren() ){
+                        ratingSum = ratingSum + Integer.valueOf(child.getValue().toString());
+                        ratingTotal++;
+                    }
+                    if(ratingTotal != 0){
+                        ratingAverage = ratingSum/ratingTotal;
+                        mRatingBar.setRating(ratingAverage);
                     }
                 }
             }
