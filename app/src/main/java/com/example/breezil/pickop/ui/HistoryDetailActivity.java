@@ -122,7 +122,7 @@ public class HistoryDetailActivity extends AppCompatActivity implements OnMapRea
 
                         if (child.getKey().equals("distance")) {
                             distance = child.getValue().toString();
-                            mDistanceText.setText(distance.substring(0,Math.min(distance.length(), 5 ))+ " km");
+                            mDistanceText.setText("distance :"+ distance.substring(0,Math.min(distance.length(), 5 ))+ " km");
                             pickOpPrice = Double.valueOf(distance) * 5;
                         }
 

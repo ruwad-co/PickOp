@@ -779,6 +779,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
                     LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
 
+                    float zoomLevel = 16.0f;
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
