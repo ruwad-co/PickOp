@@ -24,6 +24,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
@@ -94,6 +95,9 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
     LocationRequest mLocationRequest;
 
+
+    BottomSheetDialog pickOpOptionSheet;
+
     Button mRequestbtn;
     FloatingActionButton mCancelRequestBtn;
     FloatingActionButton mMenuBtn;
@@ -126,9 +130,9 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
 
     private RadioGroup mPickOpGroup;
-    private RadioButton mPickOpLight;
-    private RadioButton mPickOpMedium;
-    private RadioButton mPickOpHeavy;
+    private LinearLayout mPickOpLight;
+    private LinearLayout mPickOpMedium;
+    private LinearLayout mPickOpHeavy;
     String mRequestType;
 
 
@@ -249,10 +253,14 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     private void request() {
         if (requestBool) {
             cancelRequest();
+            mRequestbtn.setText("Cancel");
         } else {
-            sendRequest();
+            showPickOpOptions();
+//            sendRequest();
         }
     }
+
+
 
     private void userNavInfo() {
         mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Customer").child(mAuth.getCurrentUser().getUid());
@@ -321,7 +329,50 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     }
 
 
-    void sendRequest() {
+    private void showPickOpOptions() {
+        pickOpOptionSheet = new BottomSheetDialog(this);
+        View bottomSheetView = this.getLayoutInflater().inflate(R.layout.choose_pickop_sheet, null);
+
+        pickOpOptionSheet.setContentView(bottomSheetView);
+        pickOpOptionSheet.show();
+
+        mPickOpLight = bottomSheetView.findViewById(R.id.pickop_light_sheet);
+        mPickOpMedium = bottomSheetView.findViewById(R.id.pickop_medium_sheet);
+        mPickOpHeavy = bottomSheetView.findViewById(R.id.pickop_heavy_sheet);
+
+        mPickOpLight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String requestType = "PickOpLight";
+                sendRequest(requestType);
+                pickOpOptionSheet.dismiss();
+            }
+        });
+
+        mPickOpMedium.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String requestType = "PickOpMedium";
+                sendRequest(requestType);
+                pickOpOptionSheet.dismiss();
+            }
+        });
+
+        mPickOpHeavy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String requestType = "PickOpHeavy";
+                sendRequest(requestType);
+                pickOpOptionSheet.dismiss();
+            }
+        });
+
+
+    }
+
+
+    void sendRequest(String requestType) {
 
         int selectedId = mPickOpGroup.getCheckedRadioButtonId();
 
@@ -331,7 +382,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
             return;
         }
 
-        mRequestType = pickOpType.getText().toString();
+        mRequestType = requestType ;
 
 
         requestBool = true;
@@ -408,73 +459,76 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 //
 //
 
-                            DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
-                                    .child("Users").child("Driver").child(driverFoundId).child("available");
-
-                            String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-                            HashMap map = new HashMap();
-                            map.put("customerId", customerId);
-                            map.put("destination", destination);
-                            map.put("destinationLat", destinationLatLong.latitude);
-                            map.put("destinationLong", destinationLatLong.longitude);
-                            driverRef.updateChildren(map);
-
-                            getDriverLocation();
-
-                            getDriversInformation();
-                            getHasPickOpEnded();
-
-                            mRequestbtn.setText("Looking for PickOp ...");
-                            Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
-
-
-
+//                            DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
+//                                    .child("Users").child("Driver").child(driverFoundId).child("available");
+//
+//                            String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//
+//                            HashMap map = new HashMap();
+//                            map.put("customerId", customerId);
+//                            map.put("destination", destination);
+//                            map.put("destinationLat", destinationLatLong.latitude);
+//                            map.put("destinationLong", destinationLatLong.longitude);
+//                            driverRef.updateChildren(map);
+//
+//                            getDriverLocation();
+//
+//                            getDriversInformation();
+//                            getHasPickOpEnded();
+//
+//                            mRequestbtn.setText("Looking for PickOp ...");
+//                            Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
+//
 
 
-//
-//                    DatabaseReference mCustomerRequestTypeRef = FirebaseDatabase.getInstance()
-//                            .getReference().child("Users").child("Driver").child(key);
-//                    mCustomerRequestTypeRef.addValueEventListener(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                            if(dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0 ){
-//                                Map<String, Object> typeMap = (Map<String, Object>)dataSnapshot.getValue();
-//
-//                                if(driverFound){
-//                                    return;
-//                                }
-//
-//                                if(typeMap.get("type").equals(mRequestType)){
-//                                    driverFound = true;
-//                                    driverFoundId = dataSnapshot.getKey();
-//
-//                                    DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
-//                                            .child("Users").child("Driver").child(driverFoundId).child("available");
-//
-//                                    String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//                                    HashMap map = new HashMap();
-//                                    map.put("customerId", customerId);
-//                                    map.put("destination", destination);
-//                                    driverRef.updateChildren(map);
-//
-//                                    getDriverLocation();
-//
-//                                    getDriversInformation();
-//
-//                                    mRequestbtn.setText("Looking for PickOp ...");
-//                                    Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
-//
-//                                }
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {
-//
-//                        }
-//                    });
+
+
+
+                    DatabaseReference mCustomerRequestTypeRef = FirebaseDatabase.getInstance()
+                            .getReference().child("Users").child("Driver").child(key);
+                    mCustomerRequestTypeRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0 ){
+                                Map<String, Object> typeMap = (Map<String, Object>)dataSnapshot.getValue();
+
+                                if(driverFound){
+                                    return;
+                                }
+
+                                if(typeMap.get("type").equals(mRequestType)){
+                                    driverFound = true;
+                                    driverFoundId = dataSnapshot.getKey();
+
+                                    DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
+                                            .child("Users").child("Driver").child(driverFoundId).child("available");
+
+                                    String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                                    HashMap map = new HashMap();
+                                    map.put("customerId", customerId);
+                                    map.put("destination", destination);
+                                    map.put("destinationLat", destinationLatLong.latitude);
+                                    map.put("destinationLong", destinationLatLong.longitude);
+                                    driverRef.updateChildren(map);
+
+                                    getDriverLocation();
+
+                                    getDriversInformation();
+                                    getHasPickOpEnded();
+
+                                    mRequestbtn.setText("Looking for PickOp ...");
+                                    Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
+
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
 
 
 
@@ -588,6 +642,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                     double locationLong = 0;
 
                     Toast.makeText(CustomerMapsActivity.this, "Pick Up Found", Toast.LENGTH_LONG).show();
+
                     if (map.get(0) != null) {
                         locationLat = Double.parseDouble(map.get(0).toString());
 
@@ -621,6 +676,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
                     mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLong).title("your pickup")
                             .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_pickop_car)));
+
+                    driverLocationRef.removeEventListener(driverLocationListener);
 
                 }
             }

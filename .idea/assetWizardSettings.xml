@@ -61,8 +61,8 @@
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="imageAsset" value="C:\Users\breezil\Downloads\pickup-car.png" />
-                                      <entry key="outputName" value="ic_free_ride" />
+                                      <entry key="imageAsset" value="C:\Users\breezil\Downloads\hatchback.png" />
+                                      <entry key="outputName" value="pickop_light" />
                                     </map>
                                   </option>
                                 </PersistentState>
