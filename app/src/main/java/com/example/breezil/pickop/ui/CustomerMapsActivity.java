@@ -1,6 +1,7 @@
 package com.example.breezil.pickop.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -79,6 +80,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CustomerMapsActivity extends FragmentActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String TAG = "CutomerMapsActivity";
     private DrawerLayout mDrawerLayout;
     private ConstraintLayout mNavHeader;
 
@@ -129,7 +131,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     BottomSheetDialog bottomSheetDialog;
 
 
-    private RadioGroup mPickOpGroup;
+
     private LinearLayout mPickOpLight;
     private LinearLayout mPickOpMedium;
     private LinearLayout mPickOpHeavy;
@@ -189,8 +191,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         mNavImage = navHeaderView.findViewById(R.id.customerNavImage);
         mNavFirstName = navHeaderView.findViewById(R.id.userNavName);
 
-        mPickOpGroup = findViewById(R.id.pickop_type);
-        mPickOpGroup.check(R.id.pickop_light);
+
 
 
         mMenuBtn.setOnClickListener(new View.OnClickListener() {
@@ -347,24 +348,29 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 String requestType = "PickOpLight";
                 sendRequest(requestType);
                 pickOpOptionSheet.dismiss();
+                mPickOpLight.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             }
         });
 
         mPickOpMedium.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 String requestType = "PickOpMedium";
                 sendRequest(requestType);
                 pickOpOptionSheet.dismiss();
+                mPickOpMedium.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             }
         });
 
         mPickOpHeavy.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View v) {
                 String requestType = "PickOpHeavy";
                 sendRequest(requestType);
                 pickOpOptionSheet.dismiss();
+                mPickOpHeavy.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             }
         });
 
@@ -374,13 +380,6 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
     void sendRequest(String requestType) {
 
-        int selectedId = mPickOpGroup.getCheckedRadioButtonId();
-
-        final RadioButton pickOpType = findViewById(selectedId);
-
-        if(pickOpType.getText() == null){
-            return;
-        }
 
         mRequestType = requestType ;
 
@@ -447,46 +446,9 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
                 if (!driverFound && requestBool) {
 
-                    if(driverFound){
-                        return;
-                    }
-
-                        driverFound = true;
-                        driverFoundId = key;
-
-//                        DatabaseReference requestAccepted = FirebaseDatabase.getInstance().getReference()
-//                                .child("pickUpRequest").child("extra").child(mUid).child("state");
-//
-//
-
-//                            DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
-//                                    .child("Users").child("Driver").child(driverFoundId).child("available");
-//
-//                            String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//                            HashMap map = new HashMap();
-//                            map.put("customerId", customerId);
-//                            map.put("destination", destination);
-//                            map.put("destinationLat", destinationLatLong.latitude);
-//                            map.put("destinationLong", destinationLatLong.longitude);
-//                            driverRef.updateChildren(map);
-//
-//                            getDriverLocation();
-//
-//                            getDriversInformation();
-//                            getHasPickOpEnded();
-//
-//                            mRequestbtn.setText("Looking for PickOp ...");
-//                            Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
-//
-
-
-
-
-
                     DatabaseReference mCustomerRequestTypeRef = FirebaseDatabase.getInstance()
                             .getReference().child("Users").child("Driver").child(key);
-                    mCustomerRequestTypeRef.addValueEventListener(new ValueEventListener() {
+                    mCustomerRequestTypeRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if(dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0 ){
@@ -495,6 +457,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                                 if(driverFound){
                                     return;
                                 }
+
+                                Log.d(TAG, "onDataChange: request type "+ mRequestType);
 
                                 if(typeMap.get("type").equals(mRequestType)){
                                     driverFound = true;
