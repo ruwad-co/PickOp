@@ -60,6 +60,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -128,6 +130,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     TextView driversNumber;
     CircleImageView driversImage;
     TextView driversVehicle;
+    TextView requestStateTextView;
     BottomSheetDialog bottomSheetDialog;
 
 
@@ -464,21 +467,41 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                                     driverFound = true;
                                     driverFoundId = dataSnapshot.getKey();
 
+
+
                                     DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
                                             .child("Users").child("Driver").child(driverFoundId).child("available");
+
+                                    DatabaseReference pickOpsrefRequested = FirebaseDatabase.getInstance().getReference()
+                                            .child("PickOps").child(driverFoundId);
+
+
 
                                     String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
                                     HashMap map = new HashMap();
                                     map.put("customerId", customerId);
+                                    map.put("locationLat", mLastLocation.getLatitude());
+                                    map.put("locationLong", mLastLocation.getLongitude());
                                     map.put("destination", destination);
                                     map.put("destinationLat", destinationLatLong.latitude);
                                     map.put("destinationLong", destinationLatLong.longitude);
-                                    driverRef.updateChildren(map);
+                                    map.put("request_state", "requested");
+//                                    driverRef.updateChildren(map).addOnCompleteListener(new OnCompleteListener()
+                                    pickOpsrefRequested.updateChildren(map).addOnCompleteListener(new OnCompleteListener() {
+                                        @Override
+                                        public void onComplete(@NonNull Task task) {
 
-                                    getDriverLocation();
+                                            Toast.makeText(CustomerMapsActivity.this, "waiting for pickop response",Toast.LENGTH_LONG).show();
 
-                                    getDriversInformation();
+                                            getDriverLocation();
+
+                                            getDriversInformation();
+
+                                        }
+                                    });
+
+
                                     getHasPickOpEnded();
 
                                     mRequestbtn.setText("Looking for PickOp ...");
@@ -532,6 +555,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     void getDriversInformation() {
         DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users")
                 .child("Driver").child(driverFoundId);
+        DatabaseReference stateRef = FirebaseDatabase.getInstance().getReference().child("PickOps")
+                .child(driverFoundId);
 
         bottomSheetDialog = new BottomSheetDialog(this);
         View bottomSheetView = this.getLayoutInflater().inflate(R.layout.driver_info_sheet, null);
@@ -544,6 +569,23 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         driversImage = bottomSheetView.findViewById(R.id.sheet_image);
         driversVehicle = bottomSheetView.findViewById(R.id.sheet_vehicle);
         mRatingBar = bottomSheetView.findViewById(R.id.sheet_rating);
+        requestStateTextView = bottomSheetView.findViewById(R.id.request_state);
+
+        stateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    String request_state = dataSnapshot.child("request_state").getValue().toString();
+                    requestStateTextView.setText(request_state);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         driverRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -595,8 +637,10 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     private ValueEventListener driverLocationListener;
 
     private void getDriverLocation() {
+//        driverLocationRef = FirebaseDatabase.getInstance().getReference()
+//                .child("DriversWorking").child(driverFoundId).child("l");
         driverLocationRef = FirebaseDatabase.getInstance().getReference()
-                .child("DriversWorking").child(driverFoundId).child("l");
+                .child("DriversAvailable").child(driverFoundId).child("l");
         driverLocationListener = driverLocationRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

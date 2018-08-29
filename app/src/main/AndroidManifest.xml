@@ -46,7 +46,9 @@
 
         <activity
             android:name=".ui.CustomerMapsActivity"
-            android:label="@string/title_activity_customer_maps">
+            android:label="@string/title_activity_customer_maps"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
