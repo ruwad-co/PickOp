@@ -99,11 +99,11 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
     LocationRequest mLocationRequest;
 
-
     BottomSheetDialog pickOpOptionSheet;
 
     Button mRequestbtn;
-    FloatingActionButton mCancelRequestBtn;
+    Button mCancelBtn;
+
     FloatingActionButton mMenuBtn;
 
     SupportMapFragment mapFragment;
@@ -125,29 +125,28 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     String destination;
     LatLng destinationLatLong;
 
-
     TextView driversName;
     TextView driversNumber;
     CircleImageView driversImage;
     TextView driversVehicle;
     TextView requestStateTextView;
+    Button closeBottomSheet;
+    Button showBottomSheet;
+
     BottomSheetDialog bottomSheetDialog;
-
-
 
     private LinearLayout mPickOpLight;
     private LinearLayout mPickOpMedium;
     private LinearLayout mPickOpHeavy;
     String mRequestType;
 
-
-//    userInfo
-
     String mUserFirstName;
     String mUserLastName;
     String mUserEmail;
     String mUserPhoneNumber;
     String mUserImage;
+
+    boolean accepted = false;
 
 
     @Override
@@ -177,11 +176,12 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
 
         mRequestbtn = findViewById(R.id.pickOprequestbtn);
-        mCancelRequestBtn = findViewById(R.id.cancelRequest);
+
         mDistanceText = findViewById(R.id.distanceText);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mMenuBtn = findViewById(R.id.menuFab);
+        mCancelBtn = findViewById(R.id.endPickOpBtn);
 
 
         NavigationView navigationView = findViewById(R.id.navView);
@@ -193,6 +193,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
         mNavImage = navHeaderView.findViewById(R.id.customerNavImage);
         mNavFirstName = navHeaderView.findViewById(R.id.userNavName);
+
+        showBottomSheet = findViewById(R.id.show_sheet_btn);
 
 
 
@@ -212,13 +214,13 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
             }
         });
 
-        mCancelRequestBtn.setOnClickListener(new View.OnClickListener() {
+
+
+        mCancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 cancelRequest();
             }
-
-
         });
 
 
@@ -255,13 +257,15 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     }
 
     private void request() {
-        if (requestBool) {
-            cancelRequest();
-            mRequestbtn.setText("Cancel");
-        } else {
-            showPickOpOptions();
-//            sendRequest();
-        }
+//        if (requestBool) {
+//            cancelRequest();
+//            mRequestbtn.setText("Cancel");
+//        } else {
+//            showPickOpOptions();
+////            sendRequest();
+//        }
+
+        showPickOpOptions();
     }
 
 
@@ -388,8 +392,6 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
 
         requestBool = true;
-        mCancelRequestBtn.setVisibility(View.VISIBLE);
-        mCancelRequestBtn.setEnabled(true);
 
         String Uid = mAuth.getCurrentUser().getUid();
 
@@ -417,17 +419,29 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         mPickOpMarker = mMap.addMarker(new MarkerOptions().position(mPickUpLocation).title("PickUp Here")
                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_purple)));
 
-        mRequestbtn.setText("Getting PickOP...");
+//        mRequestbtn.setText("Getting PickOP...");
 
         getClosestDriver();
+        mRequestbtn.setVisibility(View.INVISIBLE);
+        mCancelBtn.setVisibility(View.VISIBLE);
 
     }
 
     void cancelRequest() {
 
-        mCancelRequestBtn.setVisibility(View.INVISIBLE);
+
         mRequestbtn.setEnabled(true);
-        endPickOp();
+//        endPickOp();
+        mCancelBtn.setVisibility(View.INVISIBLE);
+        mRequestbtn.setVisibility(View.VISIBLE);
+
+        if(!accepted){
+            endPickOp();
+
+        }else{
+            endPickOp();
+            mCancelBtn.setText("End PickOp");
+        }
     }
 
     private int radius = 1;
@@ -461,7 +475,17 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                                     return;
                                 }
 
-                                Log.d(TAG, "onDataChange: request type "+ mRequestType);
+                                mRequestNode();
+
+                                showBottomSheet.setVisibility(View.VISIBLE);
+                                showBottomSheet.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if(bottomSheetDialog != null){
+                                            bottomSheetDialog.show();
+                                        }
+                                    }
+                                });
 
                                 if(typeMap.get("type").equals(mRequestType)){
                                     driverFound = true;
@@ -494,6 +518,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
                                             Toast.makeText(CustomerMapsActivity.this, "waiting for pickop response",Toast.LENGTH_LONG).show();
 
+                                            accepted = true;
+
                                             getDriverLocation();
 
                                             getDriversInformation();
@@ -504,8 +530,9 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
                                     getHasPickOpEnded();
 
-                                    mRequestbtn.setText("Looking for PickOp ...");
+//                                    mRequestbtn.setText("Cancel");
                                     Toast.makeText(CustomerMapsActivity.this, "Looking for drivers location", Toast.LENGTH_LONG).show();
+
 
                                 }
                             }
@@ -570,6 +597,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         driversVehicle = bottomSheetView.findViewById(R.id.sheet_vehicle);
         mRatingBar = bottomSheetView.findViewById(R.id.sheet_rating);
         requestStateTextView = bottomSheetView.findViewById(R.id.request_state);
+        closeBottomSheet = bottomSheetView.findViewById(R.id.close_sheet_btn);
 
         stateRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -630,6 +658,13 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
             }
         });
+
+        closeBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetDialog.dismiss();
+            }
+        });
     }
 
     //private Marker mDriverMarker;
@@ -683,7 +718,9 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
 
                     mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLong).title("your pickup")
-                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_pickop_car)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.mipmap.pickop_medium)));
+
+
 
                     driverLocationRef.removeEventListener(driverLocationListener);
 
@@ -697,6 +734,14 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         });
 
 
+    }
+
+    private void mRequestNode(){
+        String Uid = mAuth.getCurrentUser().getUid();
+        DatabaseReference pickOpRef = FirebaseDatabase.getInstance().getReference("pickOpRequest");
+        GeoFire geoFire = new GeoFire(pickOpRef);
+        geoFire.setLocation(Uid, new GeoLocation(mLastLocation.getLatitude(),
+                mLastLocation.getLongitude()));
     }
 
     @Override
@@ -724,8 +769,11 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     private void getHasPickOpEnded() {
 
         if(mAuth.getCurrentUser() != null){
-             pickOpEndedRef = FirebaseDatabase.getInstance().getReference()
-                    .child("Users").child("Driver").child(driverFoundId).child("available").child("customerId");
+//             pickOpEndedRef = FirebaseDatabase.getInstance().getReference()
+//                    .child("Users").child("Driver").child(driverFoundId).child("available").child("customerId");
+
+            pickOpEndedRef = FirebaseDatabase.getInstance().getReference()
+                    .child("PickOps").child(driverFoundId);
 
             pickOpEndedRefListener = pickOpEndedRef.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -789,13 +837,16 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         }
 
         mRequestbtn.setText("Request PickOp");
+        mRequestbtn.setVisibility(View.VISIBLE);
         mDistanceText.setVisibility(View.INVISIBLE);
 
         if(bottomSheetDialog != null){
             bottomSheetDialog.dismiss();
         }
 
-        mCancelRequestBtn.setVisibility(View.INVISIBLE);
+
+
+        showBottomSheet.setVisibility(View.INVISIBLE);
 
 
 
@@ -846,7 +897,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
                     float zoomLevel = 16.0f;
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
 
                 }
             }

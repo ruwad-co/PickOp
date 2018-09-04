@@ -68,8 +68,19 @@
         android:layout_marginStart="20sp"
         android:layout_below="@id/sheet_number"
         android:layout_marginTop="20sp"
-        android:layout_marginBottom="20sp"
+        android:layout_marginBottom="10sp"
         />
+
+    <Button
+        android:id="@+id/close_sheet_btn"
+        android:layout_width="match_parent"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorPrimary"
+        android:text="Close"
+        android:textColor="@color/colorWhite"
+        android:layout_below="@id/sheet_vehicle"/>
 
 
 

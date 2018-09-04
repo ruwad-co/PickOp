@@ -16,7 +16,7 @@
         android:orientation="vertical"
         android:gravity="center"
         android:layout_margin="2dp"
-        android:background="@color/dark1"
+        android:background="@drawable/touch_selector"
         android:id="@+id/pickop_light_sheet"
         android:layout_weight="5">
 
@@ -42,7 +42,7 @@
         android:gravity="center"
         android:layout_margin="2dp"
         android:layout_weight="5"
-        android:background="@color/dark1"
+        android:background="@drawable/touch_selector"
         android:id="@+id/pickop_medium_sheet">
 
         <ImageView
@@ -66,7 +66,7 @@
         android:orientation="vertical"
         android:gravity="center"
         android:layout_margin="2dp"
-        android:background="@color/dark1"
+        android:background="@drawable/touch_selector"
         android:layout_weight="5"
         android:id="@+id/pickop_heavy_sheet">
 
